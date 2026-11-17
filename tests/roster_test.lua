@@ -57,3 +57,41 @@ test("scan with no professions", function()
   GetProfessions, GetProfessionInfo = nil, nil
   eq(next(professions), nil)
 end)
+
+-- Forever names are "First Last" with no realm. Senders and GetUnitName(unit, true) give the full
+-- name; UnitName and master loot candidates may give just the first name.
+local function forever()
+  return Roster.NameIndex({
+    { full = "Salty Shenanigans", first = "Salty" },
+    { full = "Sour Shenanigans", first = "Sour" },
+  })
+end
+
+test("resolve full name", function()
+  eq(Roster.Resolve(forever(), "Sour Shenanigans"), "Sour Shenanigans")
+end)
+
+test("resolve first name to full name", function()
+  eq(Roster.Resolve(forever(), "Sour"), "Sour Shenanigans")
+end)
+
+test("resolve ignores case", function()
+  eq(Roster.Resolve(forever(), "sour shenanigans"), "Sour Shenanigans")
+  eq(Roster.Resolve(forever(), "SALTY"), "Salty Shenanigans")
+end)
+
+test("resolve unknown name returns it unchanged", function()
+  eq(Roster.Resolve(forever(), "Mule Guy"), "Mule Guy")
+end)
+
+test("resolve nil is nil", function()
+  eq(Roster.Resolve(forever(), nil), nil)
+end)
+
+test("full names win over first names", function()
+  local index = Roster.NameIndex({
+    { full = "Sour", first = "Sour" },
+    { full = "Sour Shenanigans", first = "Sour" },
+  })
+  eq(Roster.Resolve(index, "Sour"), "Sour")
+end)
