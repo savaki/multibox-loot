@@ -88,7 +88,9 @@ Thin layer between WoW API and the pure functions:
 - Gate: `GetLootMethod()` is `"master"` and the player is the master looter.
 - Builds the eligible-candidates map per slot, calls `Classify` and `PickRecipient`, calls
   `GiveMasterLoot`.
-- Failure detection: if the slot isn't cleared within ~1 second after a give, mark that
+- Skips locked slots and slots with no master loot candidates (gathering, fishing, opened
+  containers), silently.
+- Failure detection: if the slot isn't cleared within ~2.5 seconds after a give, mark that
   recipient full for this corpse and retry the slot with the next fallback.
 - If even the master looter is full, leave the item and print one warning per corpse.
 - Debug mode: prints raw slot info and the decision, does **not** give.

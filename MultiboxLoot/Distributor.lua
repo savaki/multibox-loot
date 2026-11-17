@@ -3,7 +3,7 @@ local _, ns = ...
 local Distributor = {}
 ns.Distributor = Distributor
 
-local GIVE_TIMEOUT = 1     -- seconds to wait for LOOT_SLOT_CLEARED before assuming the give failed
+local GIVE_TIMEOUT = 2.5   -- seconds to wait for LOOT_SLOT_CLEARED before assuming the give failed
 local LOOT_SLOT_ITEM = 1
 
 -- Per loot window: { full = {name=true}, skip = {slot=true}, pending = {slot, name, token}, warned = bool }
@@ -34,12 +34,14 @@ local function eligibleFor(slot)
   return eligible
 end
 
--- Returns nil for slots we never touch (coins, quest items), otherwise a decision table.
+-- Returns nil for slots we never touch (coins, locked slots, quest items, and slots with no
+-- master loot candidates — gathering, fishing and opened containers), otherwise a decision table.
 local function decide(slot)
   if GetLootSlotType(slot) ~= LOOT_SLOT_ITEM then return nil end
   local link = GetLootSlotLink(slot)
   if not link then return nil end
-  local _, _, quantity, _, _, _, isQuestItem, questID = GetLootSlotInfo(slot)
+  local _, _, quantity, _, _, locked, isQuestItem, questID = GetLootSlotInfo(slot)
+  if locked then return nil end
   local itemID, _, _, _, _, classID, subClassID = GetItemInfoInstant(link)
   if ns.Items.IsQuest(isQuestItem, questID, classID) then
     if ns.db.debug then
@@ -50,6 +52,12 @@ local function decide(slot)
   end
   local category = ns.Items.Classify(itemID, classID, subClassID)
   local eligible = eligibleFor(slot)
+  if next(eligible) == nil then
+    if ns.db.debug then
+      ns.Print(("slot %d %s: no master loot candidates — skipped"):format(slot, link))
+    end
+    return nil
+  end
   local name, reason = ns.Rules.PickRecipient(category, {
     roster = ns.Roster.members,
     eligible = eligible,
