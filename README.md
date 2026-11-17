@@ -34,6 +34,7 @@ one slot at a time:
 | Parts and devices | Engineering |
 | Gems | Blacksmithing → Engineering → Leatherworking → Tailoring → Enchanting |
 | Arcane Crystal | Alchemy → Enchanting |
+| Stat scrolls (Agility, Intellect, Protection, Spirit, Stamina, Strength) | Highest-level mage |
 | Everything else | Bank alt → master looter |
 
 Gathering professions never receive what they gather; it belongs with the crafters. The one

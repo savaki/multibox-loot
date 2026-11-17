@@ -157,3 +157,38 @@ test("no chain includes a gathering profession except Ore → Mining", function(
     end
   end
 end)
+
+-- Scrolls go to the highest-level mage, regardless of professions.
+local function units(t) return t end
+
+test("scroll goes to the highest-level mage", function()
+  local c = ctx({ roster = { Ann = member({}), Bob = member({}), War = member({}) } })
+  c.units = units({
+    Ann = { class = "MAGE", level = 30 },
+    Bob = { class = "MAGE", level = 42 },
+    War = { class = "WARRIOR", level = 60 },
+  })
+  local name, reason = Rules.PickRecipient("Scroll", c)
+  eq(name, "Bob"); eq(reason, "Mage 42")
+end)
+
+test("scroll skips a mage who can't receive", function()
+  local c = ctx({
+    roster = { Ann = member({}), Bob = member({}, 0) },
+  })
+  c.units = units({ Ann = { class = "MAGE", level = 30 }, Bob = { class = "MAGE", level = 42 } })
+  eq(Rules.PickRecipient("Scroll", c), "Ann")
+end)
+
+test("scroll with no mage falls back to bank alt", function()
+  local c = ctx({ roster = { War = member({}) }, bankAlt = "Mule" })
+  c.units = units({ War = { class = "WARRIOR", level = 60 } })
+  local name, reason = Rules.PickRecipient("Scroll", c)
+  eq(name, "Mule"); eq(reason, "bank")
+end)
+
+test("scroll ties between mages break by name", function()
+  local c = ctx({ roster = { Zed = member({}), Ann = member({}) } })
+  c.units = units({ Zed = { class = "MAGE", level = 40 }, Ann = { class = "MAGE", level = 40 } })
+  eq(Rules.PickRecipient("Scroll", c), "Ann")
+end)

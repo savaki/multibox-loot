@@ -3,8 +3,11 @@ local _, ns = ...
 local Items = {}
 ns.Items = Items
 
+local CONSUMABLE_CLASS = 0
 local TRADESKILL_CLASS = 7
 local QUEST_CLASS = 12
+-- Read from the client rather than hardcoded: the number isn't confirmed for Forever. nil when absent.
+local SCROLL_SUBCLASS = Enum and Enum.ItemConsumableSubclass and Enum.ItemConsumableSubclass.Scroll
 
 -- Tradeskill subclass → category, used only when an item isn't in the ID tables.
 -- Many Classic items carry the generic subclass 0 ("Trade Goods"), which stays unclassified.
@@ -271,11 +274,22 @@ add("ArcaneCrystal", {
   12363, -- Arcane Crystal
 })
 
--- Returns a category name, or nil when the item isn't a known profession material.
+-- Stat scrolls, verified against Wowhead's Forever database. They go to a mage (Rules.CLASS_ROUTES).
+add("Scroll", {
+  3012, 1477, 4425, 10309,  -- Scroll of Agility I–IV
+  955, 2290, 4419, 10308,   -- Scroll of Intellect I–IV
+  3013, 1478, 4421, 10305,  -- Scroll of Protection I–IV
+  1181, 1712, 4424, 10306,  -- Scroll of Spirit I–IV
+  1180, 1711, 4422, 10307,  -- Scroll of Stamina I–IV
+  954, 2289, 4426, 10310,   -- Scroll of Strength I–IV
+})
+
+-- Returns a category name, or nil when the item isn't one we route.
 function Items.Classify(itemID, classID, subClassID)
   local category = BY_ID[itemID]
   if category then return category end
   if classID == TRADESKILL_CLASS then return BY_SUBCLASS[subClassID] end
+  if classID == CONSUMABLE_CLASS and SCROLL_SUBCLASS and subClassID == SCROLL_SUBCLASS then return "Scroll" end
   return nil
 end
 

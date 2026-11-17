@@ -19,6 +19,11 @@ Rules.CHAINS = {
   ArcaneCrystal = { "Alchemy", "Enchanting" },
 }
 
+-- Category → class whose highest-level member gets it, ahead of any profession chain.
+Rules.CLASS_ROUTES = {
+  Scroll = "MAGE",
+}
+
 -- A name can receive if it is eligible for this corpse, not marked full, and
 -- doesn't report zero free slots (unknown free slots count as room).
 local function canReceive(ctx, name)
@@ -33,8 +38,20 @@ end
 --   full         name -> true if a give to them failed on this corpse
 --   bankAlt      name or nil
 --   masterLooter name
--- Returns name, reason ("Tailoring 145", "bank", "master looter"), or nil.
+--   units        name -> { class = "MAGE", level = 40 } for group members (class routes only)
+-- Returns name, reason ("Tailoring 145", "Mage 42", "bank", "master looter"), or nil.
 function Rules.PickRecipient(category, ctx)
+  local class = category and Rules.CLASS_ROUTES[category]
+  if class then
+    local best, bestLevel
+    for name, unit in pairs(ctx.units or {}) do
+      if unit.class == class and canReceive(ctx, name)
+        and (bestLevel == nil or unit.level > bestLevel or (unit.level == bestLevel and name < best)) then
+        best, bestLevel = name, unit.level
+      end
+    end
+    if best then return best, class:sub(1, 1) .. class:sub(2):lower() .. " " .. bestLevel end
+  end
   local chain = category and Rules.CHAINS[category]
   if chain then
     for _, profession in ipairs(chain) do

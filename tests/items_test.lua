@@ -32,3 +32,7 @@ test("quest: quest starter", function() eq(Items.IsQuest(false, 1234, 7), true) 
 test("quest: quest item class", function() eq(Items.IsQuest(false, nil, 12), true) end)
 test("quest: ordinary trade good", function() eq(Items.IsQuest(false, nil, 7), false) end)
 test("quest: questID 0 is not a quest", function() eq(Items.IsQuest(nil, 0, 7), false) end)
+
+test("table: Scroll of Intellect is Scroll", function() eq(Items.Classify(955), "Scroll") end)
+test("table: Scroll of Stamina IV is Scroll", function() eq(Items.Classify(10307), "Scroll") end)
+test("table: Scroll of Agility III is Scroll", function() eq(Items.Classify(4425), "Scroll") end)

@@ -118,6 +118,18 @@ function Roster.GroupIndex()
   return Roster.NameIndex(names)
 end
 
+-- Full name → { class = "MAGE", level = 40 } for everyone in the group, read locally (no messaging).
+function Roster.GroupUnits()
+  local info = {}
+  local units = groupUnits()
+  units[#units + 1] = "player"
+  for _, unit in ipairs(units) do
+    local full = ns.FullName(unit)
+    if full then info[full] = { class = select(2, UnitClass(unit)), level = UnitLevel(unit) or 0 } end
+  end
+  return info
+end
+
 local function prune()
   local index = Roster.GroupIndex()
   for name in pairs(Roster.members) do
