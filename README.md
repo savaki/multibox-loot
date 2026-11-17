@@ -93,3 +93,7 @@ To add a missing material, put its ID in the right list in `Items.lua` and add a
 in `tests/items_test.lua`. Item IDs can be checked at `https://www.wowhead.com/forever/item=<ID>`.
 
 Design notes are in [`docs/superpowers/specs`](docs/superpowers/specs).
+
+## License
+
+[MIT](LICENSE)
