@@ -1,0 +1,33 @@
+local test, eq, ns = ...
+local Items = ns.Items
+
+test("table: Linen Cloth is Cloth", function() eq(Items.Classify(2589), "Cloth") end)
+test("table: Light Leather is Leather", function() eq(Items.Classify(2318), "Leather") end)
+test("table: Light Hide is Leather", function() eq(Items.Classify(783), "Leather") end)
+test("table: Peacebloom is Herb", function() eq(Items.Classify(2447), "Herb") end)
+test("table: Copper Ore is Metal", function() eq(Items.Classify(2770), "Metal") end)
+test("table: Coarse Stone is Metal", function() eq(Items.Classify(2836), "Metal") end)
+test("table: Strange Dust is Enchanting", function() eq(Items.Classify(10940), "Enchanting") end)
+test("table: Chunk of Boar Meat is Cooking", function() eq(Items.Classify(769), "Cooking") end)
+test("table: Malachite is Gem", function() eq(Items.Classify(774), "Gem") end)
+test("table: Arcane Crystal is ArcaneCrystal", function() eq(Items.Classify(12363), "ArcaneCrystal") end)
+test("forever: Stranglevine is Herb", function() eq(Items.Classify(249274), "Herb") end)
+test("forever: Scarce Herb Seeds is HerbSeed", function() eq(Items.Classify(268418), "HerbSeed") end)
+test("forever: Heavy Thorium Bar is Metal", function() eq(Items.Classify(251291), "Metal") end)
+test("forever: Torbernite is Metal", function() eq(Items.Classify(248820), "Metal") end)
+test("forever: Pristine Leather is Leather", function() eq(Items.Classify(249427), "Leather") end)
+test("forever: Fel Crystal is Enchanting", function() eq(Items.Classify(248819), "Enchanting") end)
+
+test("table wins over generic subclass", function() eq(Items.Classify(2589, 7, 0), "Cloth") end)
+test("fallback: tradeskill Cloth subclass", function() eq(Items.Classify(999999, 7, 5), "Cloth") end)
+test("fallback: tradeskill Herb subclass", function() eq(Items.Classify(999999, 7, 9), "Herb") end)
+test("fallback: tradeskill Parts subclass", function() eq(Items.Classify(999999, 7, 1), "EngineeringParts") end)
+test("fallback: generic Trade Goods subclass is unclassified", function() eq(Items.Classify(999999, 7, 0), nil) end)
+test("fallback: armor is unclassified", function() eq(Items.Classify(999999, 4, 2), nil) end)
+test("no class info is unclassified", function() eq(Items.Classify(999999), nil) end)
+
+test("quest: isQuestItem flag", function() eq(Items.IsQuest(true, nil, 7), true) end)
+test("quest: quest starter", function() eq(Items.IsQuest(false, 1234, 7), true) end)
+test("quest: quest item class", function() eq(Items.IsQuest(false, nil, 12), true) end)
+test("quest: ordinary trade good", function() eq(Items.IsQuest(false, nil, 7), false) end)
+test("quest: questID 0 is not a quest", function() eq(Items.IsQuest(nil, 0, 7), false) end)
