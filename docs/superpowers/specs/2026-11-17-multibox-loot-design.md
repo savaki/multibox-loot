@@ -144,5 +144,5 @@ docs/superpowers/specs/2026-11-17-multibox-loot-design.md
 
 ## Open Items to Verify In-Game
 
-- Forever's `## Interface:` TOC number (read via `/dump select(4, GetBuildInfo())`).
+- Forever's `## Interface:` is 16001 (confirmed from ForeverCore.toc).
 - Forever has no Jewelcrafting (confirmed). New Forever materials found so far are in the tables; add any others seen in debug output.
