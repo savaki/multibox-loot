@@ -178,6 +178,13 @@ test("table: Coarse Stone is Metal", function() eq(Items.Classify(2836), "Metal"
 test("table: Strange Dust is Enchanting", function() eq(Items.Classify(10940), "Enchanting") end)
 test("table: Chunk of Boar Meat is Cooking", function() eq(Items.Classify(769), "Cooking") end)
 test("table: Malachite is Gem", function() eq(Items.Classify(774), "Gem") end)
+test("table: Arcane Crystal is ArcaneCrystal", function() eq(Items.Classify(12363), "ArcaneCrystal") end)
+test("forever: Stranglevine is Herb", function() eq(Items.Classify(249274), "Herb") end)
+test("forever: Scarce Herb Seeds is HerbSeed", function() eq(Items.Classify(268418), "HerbSeed") end)
+test("forever: Heavy Thorium Bar is Metal", function() eq(Items.Classify(251291), "Metal") end)
+test("forever: Torbernite is Metal", function() eq(Items.Classify(248820), "Metal") end)
+test("forever: Pristine Leather is Leather", function() eq(Items.Classify(249427), "Leather") end)
+test("forever: Fel Crystal is Enchanting", function() eq(Items.Classify(248819), "Enchanting") end)
 
 test("table wins over generic subclass", function() eq(Items.Classify(2589, 7, 0), "Cloth") end)
 test("fallback: tradeskill Cloth subclass", function() eq(Items.Classify(999999, 7, 5), "Cloth") end)
@@ -266,6 +273,12 @@ add("Leather", {
   7286,  -- Black Whelp Scale
   15417, -- Devilsaur Leather
   17012, -- Core Leather
+  -- WoW: Forever
+  249427, -- Pristine Leather
+  249428, -- Pristine Hide
+  249429, -- Pristine Scale
+  248824, -- Fel Hide
+  248825, -- Fel Leather
 })
 
 add("Herb", {
@@ -298,6 +311,20 @@ add("Herb", {
   13466, -- Plaguebloom
   13467, -- Icecap
   13468, -- Black Lotus
+  -- WoW: Forever
+  249274, -- Stranglevine
+  249424, -- Rosecap
+  248821, -- Demonsage
+  248822, -- Death Lotus
+  248823, -- Marefoil
+})
+
+-- WoW: Forever herb seeds
+add("HerbSeed", {
+  268415, -- Commonplace Herb Seeds
+  268416, -- Uncommon Herb Seeds
+  268417, -- Unusual Herb Seeds
+  268418, -- Scarce Herb Seeds
 })
 
 add("Metal", {
@@ -325,6 +352,14 @@ add("Metal", {
   2838,  -- Heavy Stone
   7912,  -- Solid Stone
   12365, -- Dense Stone
+  -- WoW: Forever
+  248815, -- Heavy Thorium Ore
+  251291, -- Heavy Thorium Bar
+  249726, -- Azerothium Bar
+  251290, -- Legionite Bar
+  249426, -- Pitchblende
+  249425, -- Bauxite
+  248820, -- Torbernite
 })
 
 add("Enchanting", {
@@ -352,6 +387,10 @@ add("Enchanting", {
   14343, -- Small Brilliant Shard
   14344, -- Large Brilliant Shard
   20725, -- Nexus Crystal
+  -- WoW: Forever
+  247786, -- Mote of Magic
+  274030, -- Malleable Essence of Nature
+  248819, -- Fel Crystal
 })
 
 add("Cooking", {
@@ -379,6 +418,52 @@ add("Cooking", {
   12205, -- White Spider Meat
   12207, -- Giant Egg
   12208, -- Tender Wolf Meat
+  730,   -- Murloc Eye
+  731,   -- Goretusk Snout
+  1080,  -- Tough Condor Meat
+  1081,  -- Crisp Spider Meat
+  1468,  -- Murloc Fin
+  2251,  -- Gooey Spider Leg
+  2296,  -- Great Goretusk Snout
+  2677,  -- Boar Ribs
+  2886,  -- Crag Boar Rib
+  2924,  -- Crocolisk Meat
+  3172,  -- Boar Intestines
+  3174,  -- Spider Ichor
+  3404,  -- Buzzard Wing
+  3667,  -- Tender Crocolisk Meat
+  4655,  -- Giant Clam Meat
+  5051,  -- Dig Rat
+  5465,  -- Small Spider Leg
+  5467,  -- Kodo Meat
+  5468,  -- Soft Frenzy Flesh
+  5469,  -- Strider Meat
+  5470,  -- Thunder Lizard Tail
+  5471,  -- Stag Meat
+  7974,  -- Zesty Clam Meat
+  12202, -- Tiger Meat
+  12204, -- Heavy Kodo Meat
+  12206, -- Tender Crab Meat
+  12223, -- Meaty Bat Wing
+  20424, -- Sandworm Meat
+  -- Fish
+  4603,  -- Raw Spotted Yellowtail
+  6303,  -- Raw Slitherskin Mackerel
+  6308,  -- Raw Bristle Whisker Catfish
+  6317,  -- Raw Loch Frenzy
+  6361,  -- Raw Rainbow Fin Albacore
+  6362,  -- Raw Rockscale Cod
+  6522,  -- Deviate Fish
+  8365,  -- Raw Mithril Head Trout
+  13754, -- Raw Glossy Mightfish
+  13758, -- Raw Redgill
+  13759, -- Raw Nightfin Snapper
+  13760, -- Raw Sunscale Salmon
+  13888, -- Darkclaw Lobster
+  13889, -- Raw Whitescale Salmon
+  13893, -- Large Raw Mightfish
+  21071, -- Raw Sagefish
+  21153, -- Raw Greater Sagefish
 })
 
 add("Gem", {
@@ -392,10 +477,14 @@ add("Gem", {
   7909,  -- Aquamarine
   7910,  -- Star Ruby
   12361, -- Blue Sapphire
-  12363, -- Arcane Crystal
   12364, -- Huge Emerald
   12799, -- Large Opal
   12800, -- Azerothian Diamond
+})
+
+-- Mostly an Alchemy transmute reagent, so it doesn't follow the gem chain.
+add("ArcaneCrystal", {
+  12363, -- Arcane Crystal
 })
 
 -- Returns a category name, or nil when the item isn't a known profession material.
@@ -417,7 +506,7 @@ end
 - [ ] **Step 5: Run tests to verify they pass**
 
 Run: `lua tests/run.lua`
-Expected: `21 passed, 0 failed`.
+Expected: `28 passed, 0 failed`.
 
 - [ ] **Step 6: Commit**
 
@@ -592,10 +681,12 @@ Rules.CHAINS = {
   Cloth = { "Tailoring" },
   Cooking = { "Cooking" },
   Herb = { "Alchemy" },
+  HerbSeed = { "Herbalism", "Alchemy" },
   Metal = { "Blacksmithing", "Engineering", "Mining" },
   Enchanting = { "Enchanting" },
   EngineeringParts = { "Engineering" },
-  Gem = { "Blacksmithing", "Jewelcrafting" },
+  Gem = { "Blacksmithing", "Engineering", "Leatherworking", "Tailoring", "Enchanting" },
+  ArcaneCrystal = { "Alchemy", "Enchanting" },
 }
 
 -- A name can receive if it is eligible for this corpse, not marked full, and
@@ -637,7 +728,7 @@ end
 - [ ] **Step 5: Run tests to verify they pass**
 
 Run: `lua tests/run.lua`
-Expected: `34 passed, 0 failed`.
+Expected: `41 passed, 0 failed`.
 
 - [ ] **Step 6: Commit**
 
@@ -715,12 +806,11 @@ ns.Roster = Roster
 
 Roster.PREFIX = "MBLOOT"
 
--- Skill line names we report (English client).
+-- Skill line names we report (English client). Forever has no Jewelcrafting.
 Roster.PROFESSIONS = {
   Alchemy = true, Blacksmithing = true, Cooking = true, Enchanting = true,
   Engineering = true, ["First Aid"] = true, Fishing = true, Herbalism = true,
-  Jewelcrafting = true, Leatherworking = true, Mining = true, Skinning = true,
-  Tailoring = true,
+  Leatherworking = true, Mining = true, Skinning = true, Tailoring = true,
 }
 
 -- Wire format: "Cooking=80,Tailoring=145;12" — professions, then free bag slots.
@@ -856,7 +946,7 @@ end)
 - [ ] **Step 5: Run tests to verify they pass**
 
 Run: `lua tests/run.lua`
-Expected: `39 passed, 0 failed`.
+Expected: `46 passed, 0 failed`.
 
 - [ ] **Step 6: Commit**
 
@@ -1012,7 +1102,7 @@ end)
 - [ ] **Step 2: Syntax check against Lua**
 
 Run: `luac -p MultiboxLoot/*.lua && lua tests/run.lua`
-Expected: no `luac` output, then `39 passed, 0 failed`.
+Expected: no `luac` output, then `46 passed, 0 failed`.
 
 - [ ] **Step 3: Commit**
 
@@ -1071,7 +1161,7 @@ end
 - [ ] **Step 2: Syntax check and tests**
 
 Run: `luac -p MultiboxLoot/*.lua && lua tests/run.lua`
-Expected: `39 passed, 0 failed`.
+Expected: `46 passed, 0 failed`.
 
 - [ ] **Step 3: Commit**
 

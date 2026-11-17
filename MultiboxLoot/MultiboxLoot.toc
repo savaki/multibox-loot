@@ -1,0 +1,11 @@
+## Interface: 16001
+## Title: MultiboxLoot
+## Notes: Master-loots profession materials to the party member who uses them.
+## Version: 0.1.0
+## SavedVariables: MultiboxLootDB
+
+Core.lua
+Items.lua
+Rules.lua
+Roster.lua
+Distributor.lua

@@ -46,7 +46,10 @@ Each give prints `[MBL] <item> xN → <name> (<profession> <skill>)` unless quie
   Metal & Stone, Cooking, Herb, Enchanting, Parts/Devices). The classID/subClassID are passed
   in so the function stays pure and testable.
 
-Categories: `Leather`, `Cloth`, `Cooking`, `Herb`, `Metal`, `Enchanting`, `EngineeringParts`, `Gem`.
+Categories: `Leather`, `Cloth`, `Cooking`, `Herb`, `HerbSeed`, `Metal`, `Enchanting`, `EngineeringParts`, `Gem`, `ArcaneCrystal`.
+
+Item IDs (vanilla + Forever additions) were verified against Wowhead's Forever database
+(`https://nether.wowhead.com/forever/tooltip/item/<ID>`) on 2026-11-17.
 
 ## Rules (`Rules.lua`)
 
@@ -56,10 +59,12 @@ Categories: `Leather`, `Cloth`, `Cooking`, `Herb`, `Metal`, `Enchanting`, `Engin
 | Cloth | Tailoring |
 | Cooking | Cooking |
 | Herb | Alchemy |
+| HerbSeed (Forever) | Herbalism → Alchemy |
 | Metal (ore, bars, stone) | Blacksmithing → Engineering → Mining |
 | Enchanting | Enchanting |
 | EngineeringParts | Engineering |
-| Gem | Blacksmithing → Jewelcrafting |
+| Gem | Blacksmithing → Engineering → Leatherworking → Tailoring → Enchanting |
+| ArcaneCrystal | Alchemy → Enchanting |
 | (unclassified) | → bank alt → master looter |
 
 `PickRecipient(category, roster, eligible, fullThisCorpse, bankAlt, masterLooter) → name | nil`.
@@ -83,7 +88,9 @@ Thin layer between WoW API and the pure functions:
 - Gate: `GetLootMethod()` is `"master"` and the player is the master looter.
 - Builds the eligible-candidates map per slot, calls `Classify` and `PickRecipient`, calls
   `GiveMasterLoot`.
-- Failure detection: if the slot isn't cleared within ~1 second after a give, mark that
+- Skips locked slots and slots with no master loot candidates (gathering, fishing, opened
+  containers), silently.
+- Failure detection: if the slot isn't cleared within ~2.5 seconds after a give, mark that
   recipient full for this corpse and retry the slot with the next fallback.
 - If even the master looter is full, leave the item and print one warning per corpse.
 - Debug mode: prints raw slot info and the decision, does **not** give.
@@ -137,5 +144,5 @@ docs/superpowers/specs/2026-11-17-multibox-loot-design.md
 
 ## Open Items to Verify In-Game
 
-- Forever's `## Interface:` TOC number (read via `/dump select(4, GetBuildInfo())`).
-- Whether Forever adds professions (e.g. Jewelcrafting) or new material items needing table entries.
+- Forever's `## Interface:` is 16001 (confirmed from ForeverCore.toc).
+- Forever has no Jewelcrafting (confirmed). New Forever materials found so far are in the tables; add any others seen in debug output.
