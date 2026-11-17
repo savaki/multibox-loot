@@ -5,11 +5,12 @@ ns.Roster = Roster
 
 Roster.PREFIX = "MBLOOT"
 
--- Skill line names we report (English client). Forever has no Jewelcrafting.
-Roster.PROFESSIONS = {
-  Alchemy = true, Blacksmithing = true, Cooking = true, Enchanting = true,
-  Engineering = true, ["First Aid"] = true, Fishing = true, Herbalism = true,
-  Leatherworking = true, Mining = true, Skinning = true, Tailoring = true,
+-- Skill line ID → the profession name used in Rules.CHAINS. IDs are the same in every client
+-- language. Forever has no Jewelcrafting.
+Roster.SKILL_LINES = {
+  [171] = "Alchemy", [164] = "Blacksmithing", [185] = "Cooking", [333] = "Enchanting",
+  [202] = "Engineering", [129] = "First Aid", [356] = "Fishing", [182] = "Herbalism",
+  [165] = "Leatherworking", [186] = "Mining", [393] = "Skinning", [197] = "Tailoring",
 }
 
 -- Wire format: "Cooking=80,Tailoring=145;12" — professions, then free bag slots.
@@ -32,18 +33,14 @@ function Roster.Decode(msg)
   return { professions = professions, freeSlots = tonumber(slotPart) }
 end
 
-local function scanProfessions()
-  -- Expand collapsed headers, back to front so earlier indexes stay valid.
-  for i = GetNumSkillLines(), 1, -1 do
-    local _, isHeader, isExpanded = GetSkillLineInfo(i)
-    if isHeader and not isExpanded then ExpandSkillHeader(i) end
-  end
+-- Forever has no skill list (GetNumSkillLines/GetSkillLineInfo are nil), so professions come from
+-- GetProfessions, which returns up to six indexes with nil gaps.
+function Roster.ScanProfessions()
   local professions = {}
-  for i = 1, GetNumSkillLines() do
-    local name, isHeader, _, rank = GetSkillLineInfo(i)
-    if not isHeader and Roster.PROFESSIONS[name] then
-      professions[name] = rank
-    end
+  for _, index in pairs({ GetProfessions() }) do
+    local _, _, rank, _, _, _, skillLine = GetProfessionInfo(index)
+    local name = Roster.SKILL_LINES[skillLine]
+    if name then professions[name] = rank end
   end
   return professions
 end
@@ -60,7 +57,7 @@ local function countFreeSlots()
 end
 
 function Roster.Broadcast()
-  local professions, freeSlots = scanProfessions(), countFreeSlots()
+  local professions, freeSlots = Roster.ScanProfessions(), countFreeSlots()
   Roster.members[ns.PlayerName()] = { professions = professions, freeSlots = freeSlots, seen = time() }
   if IsInGroup() then
     C_ChatInfo.SendAddonMessage(Roster.PREFIX, Roster.Encode(professions, freeSlots), IsInRaid() and "RAID" or "PARTY")
@@ -120,9 +117,15 @@ function Roster.PrintStatus()
   end
 end
 
+-- Sent after login/reload so members that broadcast before we were listening resend.
+local REQUEST = "?"
+
 ns.On("PLAYER_LOGIN", function()
   C_ChatInfo.RegisterAddonMessagePrefix(Roster.PREFIX)
   broadcastSoon()
+  if IsInGroup() then
+    C_ChatInfo.SendAddonMessage(Roster.PREFIX, REQUEST, IsInRaid() and "RAID" or "PARTY")
+  end
 end)
 
 ns.On("GROUP_ROSTER_UPDATE", function()
@@ -135,6 +138,10 @@ ns.On("BAG_UPDATE", broadcastSoon)
 
 ns.On("CHAT_MSG_ADDON", function(prefix, msg, _, sender)
   if prefix ~= Roster.PREFIX then return end
+  if msg == REQUEST then
+    broadcastSoon()
+    return
+  end
   local entry = Roster.Decode(msg)
   if not entry then return end
   entry.seen = time()
