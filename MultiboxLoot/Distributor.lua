@@ -25,11 +25,12 @@ local function isMasterLooter()
   return partyIndex == 0
 end
 
-local function eligibleFor(slot)
+-- Candidate names may be just the first name on Forever: key them by full name, like the roster.
+local function eligibleFor(slot, index)
   local eligible = {}
   for i = 1, MAX_RAID_MEMBERS do
     local name = GetMasterLootCandidate(slot, i)
-    if name then eligible[Ambiguate(name, "none")] = i end
+    if name then eligible[ns.Roster.Resolve(index, name)] = i end
   end
   return eligible
 end
@@ -51,7 +52,8 @@ local function decide(slot)
     return nil
   end
   local category = ns.Items.Classify(itemID, classID, subClassID)
-  local eligible = eligibleFor(slot)
+  local index = ns.Roster.GroupIndex()
+  local eligible = eligibleFor(slot, index)
   if next(eligible) == nil then
     if ns.db.debug then
       ns.Print(("slot %d %s: no master loot candidates — skipped"):format(slot, link))
@@ -62,7 +64,7 @@ local function decide(slot)
     roster = ns.Roster.members,
     eligible = eligible,
     full = state.full,
-    bankAlt = ns.db.bankAlt,
+    bankAlt = ns.Roster.Resolve(index, ns.db.bankAlt),
     masterLooter = ns.PlayerName(),
   })
   return {

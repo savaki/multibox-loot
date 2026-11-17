@@ -75,13 +75,25 @@ local function broadcastSoon()
   end)
 end
 
-local function prune()
-  local me = ns.PlayerName()
-  for name in pairs(Roster.members) do
-    if name ~= me and not (UnitInParty(name) or UnitInRaid(name)) then
-      Roster.members[name] = nil
-    end
+-- names: list of { full = "First Last", first = "First" }. Returns lowercased name → full name.
+-- Full names are indexed first so a first name never shadows someone's full name.
+function Roster.NameIndex(names)
+  local index = {}
+  for _, n in ipairs(names) do
+    index[n.full:lower()] = n.full
   end
+  for _, n in ipairs(names) do
+    local key = n.first and n.first:lower()
+    if key and not index[key] then index[key] = n.full end
+  end
+  return index
+end
+
+-- Any spelling of a group member's name (first or full, any case) → their full name.
+-- Names not in the group come back unchanged.
+function Roster.Resolve(index, name)
+  if not name then return nil end
+  return index[name:lower()] or name
 end
 
 local function groupUnits()
@@ -95,12 +107,30 @@ local function groupUnits()
   return units
 end
 
+function Roster.GroupIndex()
+  local names = {}
+  local units = groupUnits()
+  units[#units + 1] = "player" -- raid units include us, a party's don't; duplicates are harmless
+  for _, unit in ipairs(units) do
+    local full = ns.FullName(unit)
+    if full then names[#names + 1] = { full = full, first = UnitName(unit) } end
+  end
+  return Roster.NameIndex(names)
+end
+
+local function prune()
+  local index = Roster.GroupIndex()
+  for name in pairs(Roster.members) do
+    if not index[name:lower()] then Roster.members[name] = nil end
+  end
+end
+
 function Roster.PrintStatus()
   local db = ns.db
   ns.Print(("enabled: %s, debug: %s, quiet: %s, bank alt: %s"):format(
     tostring(db.enabled), tostring(db.debug), tostring(db.quiet), db.bankAlt or "none"))
   for _, unit in ipairs(groupUnits()) do
-    local name = UnitName(unit)
+    local name = ns.FullName(unit)
     local entry = name and Roster.members[name]
     if entry then
       local profs = {}
@@ -136,7 +166,7 @@ end)
 ns.On("SKILL_LINES_CHANGED", broadcastSoon)
 ns.On("BAG_UPDATE", broadcastSoon)
 
-ns.On("CHAT_MSG_ADDON", function(prefix, msg, _, sender)
+ns.On("CHAT_MSG_ADDON", function(prefix, msg, channel, sender)
   if prefix ~= Roster.PREFIX then return end
   if msg == REQUEST then
     broadcastSoon()
@@ -145,5 +175,8 @@ ns.On("CHAT_MSG_ADDON", function(prefix, msg, _, sender)
   local entry = Roster.Decode(msg)
   if not entry then return end
   entry.seen = time()
-  Roster.members[Ambiguate(sender, "none")] = entry
+  Roster.members[Roster.Resolve(Roster.GroupIndex(), sender)] = entry
+  if ns.db and ns.db.debug then
+    ns.Print(("roster from %s on %s: %s"):format(sender, tostring(channel), msg))
+  end
 end)

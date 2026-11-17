@@ -24,8 +24,14 @@ function ns.Print(msg)
   print("|cffe0a95a[MBL]|r " .. msg)
 end
 
+-- Forever names are "First Last" with a space and no realm. UnitName gives only the first name;
+-- GetUnitName(unit, true) gives the whole name, the same form addon message senders use.
+function ns.FullName(unit)
+  return GetUnitName(unit, true)
+end
+
 function ns.PlayerName()
-  return (UnitName("player"))
+  return ns.FullName("player")
 end
 
 ns.On("ADDON_LOADED", function(name)
@@ -41,11 +47,6 @@ local function onOff(value)
   return value and "on" or "off"
 end
 
--- "muleguy" → "Muleguy" (ASCII only; non-ASCII bytes are left as typed).
-local function normalizeName(name)
-  return name:sub(1, 1):upper() .. name:sub(2):lower()
-end
-
 SLASH_MULTIBOXLOOT1 = "/mbl"
 SlashCmdList.MULTIBOXLOOT = function(input)
   local cmd, arg = input:match("^%s*(%S*)%s*(.-)%s*$")
@@ -55,7 +56,8 @@ SlashCmdList.MULTIBOXLOOT = function(input)
     db.enabled = cmd == "on"
     ns.Print("distribution " .. cmd)
   elseif cmd == "bank" then
-    db.bankAlt = arg ~= "" and normalizeName(arg) or nil
+    -- Stored as typed; matched to a group member by Roster.Resolve (first or full name, any case).
+    db.bankAlt = arg ~= "" and arg or nil
     ns.Print("bank alt: " .. (db.bankAlt or "none"))
   elseif cmd == "debug" then
     db.debug = not db.debug
