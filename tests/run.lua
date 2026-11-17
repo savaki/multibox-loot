@@ -23,8 +23,8 @@ local function eq(actual, expected, label)
   end
 end
 
-local ADDON_FILES = { "Items.lua" }
-local TEST_FILES = { "items_test.lua" }
+local ADDON_FILES = { "Items.lua", "Rules.lua" }
+local TEST_FILES = { "items_test.lua", "rules_test.lua" }
 
 for _, file in ipairs(ADDON_FILES) do loadAddonFile(file) end
 for _, file in ipairs(TEST_FILES) do
