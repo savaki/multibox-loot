@@ -66,6 +66,7 @@ local function decide(slot)
     full = state.full,
     bankAlt = ns.Roster.Resolve(index, ns.db.bankAlt),
     masterLooter = ns.PlayerName(),
+    units = ns.Roster.GroupUnits(),
   })
   return {
     slot = slot, link = link, quantity = quantity, itemID = itemID,

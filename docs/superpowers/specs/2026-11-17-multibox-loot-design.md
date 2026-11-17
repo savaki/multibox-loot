@@ -66,6 +66,7 @@ Item IDs (vanilla + Forever additions) were verified against Wowhead's Forever d
 | EngineeringParts | Engineering |
 | Gem | Blacksmithing → Engineering → Leatherworking → Tailoring → Enchanting |
 | ArcaneCrystal | Alchemy → Enchanting |
+| Scroll | Highest-level mage (class route, `Rules.CLASS_ROUTES`) |
 | (unclassified) | → bank alt → master looter |
 
 Gathering professions never receive what they gather, except ore for smelting.
