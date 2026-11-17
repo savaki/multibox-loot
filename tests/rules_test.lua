@@ -119,3 +119,41 @@ test("master looter full returns nil", function()
   local name = Rules.PickRecipient(nil, ctx({ roster = {}, full = { Leader = true } }))
   eq(name, nil)
 end)
+
+-- Gatherers never receive what they gather, except ore, which a miner smelts.
+test("ore goes to the miner first", function()
+  local name, reason = Rules.PickRecipient("Ore", ctx({ roster = {
+    Smith = member({ Blacksmithing = 200 }),
+    Min = member({ Mining = 50 }),
+  } }))
+  eq(name, "Min"); eq(reason, "Mining 50")
+end)
+
+test("ore without a miner goes to the smith", function()
+  local name = Rules.PickRecipient("Ore", ctx({ roster = { Smith = member({ Blacksmithing = 200 }) } }))
+  eq(name, "Smith")
+end)
+
+test("bars never go to a miner", function()
+  local name = Rules.PickRecipient("Metal", ctx({ roster = { Min = member({ Mining = 200 }) } }))
+  eq(name, "Leader")
+end)
+
+test("herb seeds never go to an herbalist", function()
+  local name = Rules.PickRecipient("HerbSeed", ctx({ roster = {
+    Herb = member({ Herbalism = 200 }),
+    Alch = member({ Alchemy = 10 }),
+  } }))
+  eq(name, "Alch")
+end)
+
+test("no chain includes a gathering profession except Ore → Mining", function()
+  local gathering = { Herbalism = true, Skinning = true, Mining = true, Fishing = true }
+  for category, chain in pairs(Rules.CHAINS) do
+    for _, profession in ipairs(chain) do
+      if gathering[profession] and not (category == "Ore" and profession == "Mining") then
+        error(category .. " routes to " .. profession)
+      end
+    end
+  end
+end)

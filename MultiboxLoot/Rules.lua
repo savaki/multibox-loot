@@ -3,14 +3,16 @@ local _, ns = ...
 local Rules = {}
 ns.Rules = Rules
 
--- Category → professions to try, in order.
+-- Category → professions to try, in order. Gathering professions never receive what they
+-- gather (it's for the crafters); the one exception is ore, which a miner smelts.
 Rules.CHAINS = {
   Leather = { "Leatherworking" },
   Cloth = { "Tailoring" },
   Cooking = { "Cooking" },
   Herb = { "Alchemy" },
-  HerbSeed = { "Herbalism", "Alchemy" },
-  Metal = { "Blacksmithing", "Engineering", "Mining" },
+  HerbSeed = { "Alchemy" },
+  Ore = { "Mining", "Blacksmithing", "Engineering" }, -- the miner smelts it
+  Metal = { "Blacksmithing", "Engineering" },
   Enchanting = { "Enchanting" },
   EngineeringParts = { "Engineering" },
   Gem = { "Blacksmithing", "Engineering", "Leatherworking", "Tailoring", "Enchanting" },

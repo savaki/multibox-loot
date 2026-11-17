@@ -27,13 +27,17 @@ one slot at a time:
 | Cloth | Tailoring |
 | Meat, fish, eggs | Cooking |
 | Herbs | Alchemy |
-| Herb seeds | Herbalism → Alchemy |
-| Ore, bars, stone | Blacksmithing → Engineering → Mining |
+| Herb seeds | Alchemy |
+| Ore | Mining (to smelt) → Blacksmithing → Engineering |
+| Bars, stone | Blacksmithing → Engineering |
 | Dusts, essences, shards | Enchanting |
 | Parts and devices | Engineering |
 | Gems | Blacksmithing → Engineering → Leatherworking → Tailoring → Enchanting |
 | Arcane Crystal | Alchemy → Enchanting |
 | Everything else | Bank alt → master looter |
+
+Gathering professions never receive what they gather; it belongs with the crafters. The one
+exception is ore, which a miner needs to smelt.
 
 The item lists cover the vanilla materials plus the new Forever materials: Stranglevine,
 Heavy Thorium, Pristine Leather, Fel Crystal and others. Items not in the lists fall back to their
