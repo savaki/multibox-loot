@@ -107,7 +107,8 @@ add("HerbSeed", {
   268418, -- Scarce Herb Seeds
 })
 
-add("Metal", {
+-- Raw ore is smelted by a miner, so it routes separately from bars and stone.
+add("Ore", {
   2770,  -- Copper Ore
   2771,  -- Tin Ore
   2772,  -- Iron Ore
@@ -117,6 +118,10 @@ add("Metal", {
   7911,  -- Truesilver Ore
   10620, -- Thorium Ore
   11370, -- Dark Iron Ore
+  248815, -- Heavy Thorium Ore (WoW: Forever)
+})
+
+add("Metal", {
   2840,  -- Copper Bar
   3576,  -- Tin Bar
   2841,  -- Bronze Bar
@@ -133,7 +138,6 @@ add("Metal", {
   7912,  -- Solid Stone
   12365, -- Dense Stone
   -- WoW: Forever
-  248815, -- Heavy Thorium Ore
   251291, -- Heavy Thorium Bar
   249726, -- Azerothium Bar
   251290, -- Legionite Bar

@@ -46,7 +46,7 @@ Each give prints `[MBL] <item> xN → <name> (<profession> <skill>)` unless quie
   Metal & Stone, Cooking, Herb, Enchanting, Parts/Devices). The classID/subClassID are passed
   in so the function stays pure and testable.
 
-Categories: `Leather`, `Cloth`, `Cooking`, `Herb`, `HerbSeed`, `Metal`, `Enchanting`, `EngineeringParts`, `Gem`, `ArcaneCrystal`.
+Categories: `Leather`, `Cloth`, `Cooking`, `Herb`, `HerbSeed`, `Ore`, `Metal`, `Enchanting`, `EngineeringParts`, `Gem`, `ArcaneCrystal`.
 
 Item IDs (vanilla + Forever additions) were verified against Wowhead's Forever database
 (`https://nether.wowhead.com/forever/tooltip/item/<ID>`) on 2026-11-17.
@@ -59,13 +59,16 @@ Item IDs (vanilla + Forever additions) were verified against Wowhead's Forever d
 | Cloth | Tailoring |
 | Cooking | Cooking |
 | Herb | Alchemy |
-| HerbSeed (Forever) | Herbalism → Alchemy |
-| Metal (ore, bars, stone) | Blacksmithing → Engineering → Mining |
+| HerbSeed (Forever) | Alchemy |
+| Ore | Mining → Blacksmithing → Engineering (the miner smelts it) |
+| Metal (bars, stone) | Blacksmithing → Engineering |
 | Enchanting | Enchanting |
 | EngineeringParts | Engineering |
 | Gem | Blacksmithing → Engineering → Leatherworking → Tailoring → Enchanting |
 | ArcaneCrystal | Alchemy → Enchanting |
 | (unclassified) | → bank alt → master looter |
+
+Gathering professions never receive what they gather, except ore for smelting.
 
 `PickRecipient(category, roster, eligible, fullThisCorpse, bankAlt, masterLooter) → name | nil`.
 Pure function.
