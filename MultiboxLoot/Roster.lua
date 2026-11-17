@@ -117,9 +117,15 @@ function Roster.PrintStatus()
   end
 end
 
+-- Sent after login/reload so members that broadcast before we were listening resend.
+local REQUEST = "?"
+
 ns.On("PLAYER_LOGIN", function()
   C_ChatInfo.RegisterAddonMessagePrefix(Roster.PREFIX)
   broadcastSoon()
+  if IsInGroup() then
+    C_ChatInfo.SendAddonMessage(Roster.PREFIX, REQUEST, IsInRaid() and "RAID" or "PARTY")
+  end
 end)
 
 ns.On("GROUP_ROSTER_UPDATE", function()
@@ -132,6 +138,10 @@ ns.On("BAG_UPDATE", broadcastSoon)
 
 ns.On("CHAT_MSG_ADDON", function(prefix, msg, _, sender)
   if prefix ~= Roster.PREFIX then return end
+  if msg == REQUEST then
+    broadcastSoon()
+    return
+  end
   local entry = Roster.Decode(msg)
   if not entry then return end
   entry.seen = time()
