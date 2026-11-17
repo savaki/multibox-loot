@@ -36,3 +36,36 @@ ns.On("ADDON_LOADED", function(name)
   end
   ns.db = MultiboxLootDB
 end)
+
+local function onOff(value)
+  return value and "on" or "off"
+end
+
+-- "muleguy" → "Muleguy" (ASCII only; non-ASCII bytes are left as typed).
+local function normalizeName(name)
+  return name:sub(1, 1):upper() .. name:sub(2):lower()
+end
+
+SLASH_MULTIBOXLOOT1 = "/mbl"
+SlashCmdList.MULTIBOXLOOT = function(input)
+  local cmd, arg = input:match("^%s*(%S*)%s*(.-)%s*$")
+  cmd = cmd:lower()
+  local db = ns.db
+  if cmd == "on" or cmd == "off" then
+    db.enabled = cmd == "on"
+    ns.Print("distribution " .. cmd)
+  elseif cmd == "bank" then
+    db.bankAlt = arg ~= "" and normalizeName(arg) or nil
+    ns.Print("bank alt: " .. (db.bankAlt or "none"))
+  elseif cmd == "debug" then
+    db.debug = not db.debug
+    ns.Print("debug (dry run) " .. onOff(db.debug))
+  elseif cmd == "quiet" then
+    db.quiet = not db.quiet
+    ns.Print("quiet " .. onOff(db.quiet))
+  elseif cmd == "status" then
+    ns.Roster.PrintStatus()
+  else
+    ns.Print("/mbl on | off | bank <name> | status | debug | quiet")
+  end
+end
